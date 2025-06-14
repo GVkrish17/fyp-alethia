@@ -3,6 +3,7 @@ import json
 import asyncio
 from utils.config import TELEGRAM_API_ID, TELEGRAM_API_HASH, SESSION_NAME, MESSAGE_CONTEXT_WINDOW
 from core.tone_analyser import analyze_tone
+from core.suggestion_generator import generate_reply
 from collections import defaultdict, deque
 from telethon import TelegramClient, events
 
@@ -42,6 +43,15 @@ async def handle_message(event):
 
     tone_result = analyze_tone(msg)
     print(f"[🧠 TONE] {tone_result['tone']} - VADER: {tone_result['vader']}")
+
+    if chat_id and len(message_buffer[chat_id]) > 0:
+        chat_context = list(message_buffer[chat_id])[-100:]
+
+        #Simulated user texting style (we'll learn this later)
+        user_style_hint = "uses chill language, sometimes says 'yo', uses 😂🔥👍 emojis, short replies"
+
+        reply = generate_reply(chat_context, user_style_hint)
+        print(f"\n💡 Suggested Reply: {reply}\n")
 
 async def fetch_history(chat_username, limit=100):
     entity = await client.get_entity(chat_username)
