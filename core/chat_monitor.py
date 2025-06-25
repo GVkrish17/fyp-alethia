@@ -6,6 +6,8 @@ from core.tone_analyser import analyze_tone
 from core.suggestion_generator import generate_reply
 from collections import defaultdict, deque
 from telethon import TelegramClient, events
+from telethon.tl.types import PeerUser, PeerChat, PeerChannel
+from core.style_profiler import user_style
 
 # Message buffer: chat_id -> deque of messages
 message_buffer = defaultdict(lambda: deque(maxlen=MESSAGE_CONTEXT_WINDOW))
@@ -34,7 +36,7 @@ async def handle_message(event):
     print(f"[Chat {chat_id}] {sender_name}: {msg}")
 
     # Save raw logs (optional)
-    save_log(chat_id, message_buffer[chat_id])
+    save_log(sender_name, message_buffer[chat_id])
 
     # ANALYSIS PIPELINE: Here you can call your tone/relationship/suggestion modules
     # Example:
@@ -48,7 +50,8 @@ async def handle_message(event):
         chat_context = list(message_buffer[chat_id])[-100:]
 
         #Simulated user texting style (we'll learn this later)
-        user_style_hint = "uses chill language, sometimes says 'yo', uses 😂🔥👍 emojis, short replies"
+        user_style_hint = await user_style(chat_id,MESSAGE_CONTEXT_WINDOW)
+        print("USER STYLE: ", user_style_hint)
 
         reply = generate_reply(chat_context, user_style_hint)
         print(f"\n💡 Suggested Reply: {reply}\n")
@@ -86,3 +89,29 @@ def start_monitoring():
 
     print("[💬] Listening to real-time messages...")
     client.run_until_disconnected()
+
+async def fetch_recent_messages(chat_username_or_id, limit):
+    """
+    Fetches last `limit` messages from a specific chat and stores in message_buffer
+    """
+    entity = await client.get_entity(chat_username_or_id)
+    messages = await client.get_messages(entity, limit=limit)
+
+    chat_id = entity.id
+
+    for m in reversed(messages):  # maintain oldest → newest order
+        message_buffer[chat_id].append({
+            "sender_id": m.sender_id,
+            "text": m.text,
+            "from_me": m.out,
+            "timestamp": m.date.isoformat()
+        })
+
+    print(f"[📥] Fetched {len(messages)} historical messages from: {chat_username_or_id} (chat_id: {chat_id})")
+    return chat_id
+
+async def get_recent_chat_history(chat_username_or_id, limit):
+    """
+    Starts client, fetches past messages from target chat, returns chat_id and messages
+    """
+    return await fetch_recent_messages(chat_username_or_id, limit=limit)
