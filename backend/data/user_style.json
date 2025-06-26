@@ -1,0 +1,72 @@
+{
+  "summary": "User writes longer messages, commonly uses short forms like: it, i, t, the, on.",
+  "raw_analysis": {
+    "avg_msg_len": 36.5,
+    "top_emojis": [],
+    "top_words": [
+      [
+        "it",
+        2
+      ],
+      [
+        "i",
+        1
+      ],
+      [
+        "haven",
+        1
+      ],
+      [
+        "t",
+        1
+      ],
+      [
+        "slept",
+        1
+      ],
+      [
+        "the",
+        1
+      ],
+      [
+        "whole",
+        1
+      ],
+      [
+        "night",
+        1
+      ],
+      [
+        "working",
+        1
+      ],
+      [
+        "on",
+        1
+      ]
+    ],
+    "common_abbreviations": [
+      [
+        "it",
+        2
+      ],
+      [
+        "i",
+        1
+      ],
+      [
+        "t",
+        1
+      ],
+      [
+        "the",
+        1
+      ],
+      [
+        "on",
+        1
+      ]
+    ],
+    "is_lowercase_heavy": false
+  }
+}

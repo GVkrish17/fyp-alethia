@@ -1,0 +1,10 @@
+telethon
+aiofiles
+nltk
+vaderSentiment
+textblob
+scikit-learn
+transformers
+torch
+emoji
+requests
